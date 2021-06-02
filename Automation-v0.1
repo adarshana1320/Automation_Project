@@ -1,0 +1,31 @@
+#!/bin/bash
+my_name='Adarshana'
+s3_bucket=upgrad-adarshana
+timestamp=$(date '+%d%m%Y-%H%M%S')
+sudo apt update -y
+apt-get install apache2 -y
+systemctl status apache2
+systemctl enable apache2
+cd /var/log/apache2/
+ls -lth
+mkdir logs
+cp access.log logs/
+cp error.log logs/
+cd logs/
+ls -lth
+cd ..
+tar -cvf ${my_name}-httpd-logs-${timestamp}.tar logs
+ls -lth
+mv ${my_name}-httpd-logs-* /tmp/
+cd
+cd /tmp/
+ls -lth
+cd
+aws s3 \
+cp /tmp/${my_name}-httpd-logs-${timestamp}.tar \
+s3://${s3_bucket}/${my_name}-httpd-logs-${timestamp}.tar
+
+
+
+
+
