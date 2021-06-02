@@ -1,0 +1,33 @@
+#!/bin/bash
+my_name='Adarshana'
+s3_bucket=upgrad-adarshana
+timestamp=$(date '+%d%m%Y-%H%M%S')
+sudo apt update -y
+apt-get install apache2 -y
+systemctl status apache2
+systemctl enable apache2
+cd /var/log/apache2/
+ls -lth
+mkdir logs
+cp access.log logs/
+cp error.log logs/
+cd logs/
+ls -lth
+cd ..
+tar -cvf ${my_name}-httpd-logs-${timestamp}.tar logs
+ls -lth
+mv ${my_name}-httpd-logs-* /tmp/logs/
+cd
+touch /input.txt
+cd /tmp/logs/
+ls -lth > /input.txt
+cd
+aws s3 \
+cp /tmp/logs/${my_name}-httpd-logs-${timestamp}.tar \
+s3://${s3_bucket}/${my_name}-httpd-logs-${timestamp}.tar
+head -2 /input.txt | tail -1 > /output.txt
+awk '{print $5,$NF}' /output.txt > /op.txt
+awk -F'[" "-.]' '{print $3, $4, $5, $6, $7, $1}' /op.txt >> /var/www/html/inventory.html
+cd /var/www/html/
+echo "<br>" >> inventory.html
+
